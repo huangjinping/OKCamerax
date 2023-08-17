@@ -19,8 +19,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.camera.luban.Luban;
 import com.camera.luban.OnCompressListener;
+import com.camera.utils.CameraConstant;
 import com.camera.utils.CameraParam;
 import com.camera.utils.FileHelperUtil;
 import com.camera.utils.FileUtil;
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         notoriouspramcompeteclarify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onTEST();
+//                onTEST();
                 onCliew();
             }
         });
@@ -71,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        onTimeDisposable();
+//        onTimeDisposable();
     }
 
     private void onTimeDisposable() {
@@ -203,49 +205,55 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (106 == requestCode && resultCode == RESULT_OK) {
-            Uri data1 = data.getData();
-
-            notoriouspramcompeteclarify.setImageURI(data1);
-            File file = uriToFileApiQ(data1, this);
-            Log.d("onActivityResult", "===1===" + file.getAbsolutePath());
-
-            onChcnage(file.getAbsolutePath());
-
-            File fileOut = new File(getExternalCacheDir() + "/test_" + System.currentTimeMillis() + ".jpg");
-            FileHelperUtil.compressBmpFileToTargetSize(new File(file.getAbsolutePath()), fileOut, 1024 * 1024);
-
-            Log.d("onActivityResult", "=====2==" + fileOut.getAbsolutePath());
-
-
-            File outFile = new File(getExternalCacheDir() + "/rocket_" + System.currentTimeMillis() + ".jpg");
-
-            FileUtil.compressAndGenImage(file.getAbsolutePath(), outFile.getAbsolutePath(), 500);
-
-            onLuban(file.getAbsolutePath());
-//            Uri originalUri = data.getData();        //获得图片的uri
-//            String[] proj = {MediaStore.Images.Media.DATA};
-//            Cursor cursor = managedQuery(originalUri, proj, null, null, null);
-//            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//            cursor.moveToFirst();
-//            String picturePath = cursor.getString(column_index);
+//        //相册 身份证正面
+        if (data != null) {
+            String stringExtra = data.getStringExtra(CameraConstant.PICTURE_PATH_KEY);
+            onLuban(stringExtra);
+        }
 //
-//            Log.d("onActivityResult", "======" + picturePath);
-//            onChcnage(picturePath);
-
-        } else if (REQUEST_GALLERY1 == requestCode && resultCode == RESULT_OK)
-
-            //相册 身份证正面
-            if (data != null) {
-                Uri imageData = data.getData();
-                notoriouspramcompeteclarify.setImageURI(imageData);
-
-                String path1 = FileHelperUtil.getPath(this, imageData);
-                //获取正面裁剪后的路径
-                Log.d("onActivityResult", "======" + path1);
-
-
-            }
+//        if (106 == requestCode && resultCode == RESULT_OK) {
+//            Uri data1 = data.getData();
+//
+//            notoriouspramcompeteclarify.setImageURI(data1);
+//            File file = uriToFileApiQ(data1, this);
+//            Log.d("onActivityResult", "===1===" + file.getAbsolutePath());
+//
+//            onChcnage(file.getAbsolutePath());
+//
+//            File fileOut = new File(getExternalCacheDir() + "/test_" + System.currentTimeMillis() + ".jpg");
+//            FileHelperUtil.compressBmpFileToTargetSize(new File(file.getAbsolutePath()), fileOut, 1024 * 1024);
+//
+//            Log.d("onActivityResult", "=====2==" + fileOut.getAbsolutePath());
+//
+//
+//            File outFile = new File(getExternalCacheDir() + "/rocket_" + System.currentTimeMillis() + ".jpg");
+//
+//            FileUtil.compressAndGenImage(file.getAbsolutePath(), outFile.getAbsolutePath(), 500);
+//
+//            onLuban(file.getAbsolutePath());
+////            Uri originalUri = data.getData();        //获得图片的uri
+////            String[] proj = {MediaStore.Images.Media.DATA};
+////            Cursor cursor = managedQuery(originalUri, proj, null, null, null);
+////            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+////            cursor.moveToFirst();
+////            String picturePath = cursor.getString(column_index);
+////
+////            Log.d("onActivityResult", "======" + picturePath);
+////            onChcnage(picturePath);
+//
+//        } else if (REQUEST_GALLERY1 == requestCode && resultCode == RESULT_OK)
+////
+////            //相册 身份证正面
+////            if (data != null) {
+////                Uri imageData = data.getData();
+////                notoriouspramcompeteclarify.setImageURI(imageData);
+////
+////                String path1 = FileHelperUtil.getPath(this, imageData);
+////                //获取正面裁剪后的路径
+////                Log.d("onActivityResult", "======" + path1);
+////
+////
+//            }
 
     }
 
@@ -333,6 +341,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(File file) {
                         Log.d("onActivityResult1", "===onLuban==1=" + file.getAbsolutePath());
+
+
+                        Glide.with(MainActivity.this).load(file).into(notoriouspramcompeteclarify);
 
 
                     }

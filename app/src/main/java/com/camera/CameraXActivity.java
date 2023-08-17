@@ -18,21 +18,6 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.camera.utils.CameraConstant;
-import com.camera.utils.CameraParam;
-import com.camera.utils.CameraXPreviewViewTouchListener;
-import com.camera.utils.FocusImageView;
-import com.eastbay.camarsx2022.R;
-import com.google.common.util.concurrent.ListenableFuture;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -59,24 +44,39 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 
+import com.camera.utils.CameraConstant;
+import com.camera.utils.CameraParam;
+import com.camera.utils.CameraXPreviewViewTouchListener;
+import com.camera.utils.FocusImageView;
+import com.eastbay.camarsx2022.R;
+import com.google.common.util.concurrent.ListenableFuture;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 /**
  * author Created by harrishuang on 6/28/21.
  * email : huangjinping1000@163.com
  */
 public class CameraXActivity extends AppCompatActivity {
+    private final String TAG = "CameraXActivity";
+    private final int REQUEST_CODE_PERMISSIONS = 10;
+    private final String FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS";
     private ImageCapture imageCapture;
     private CameraControl mCameraControl;
     private CameraInfo mCameraInfo;
     private boolean isInfer = true;
     private int imageRotationDegrees = 0;
     private int flashMode = ImageCapture.FLASH_MODE_OFF;
-    private CameraSelector cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA;
+    private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
     private ExecutorService cameraExecutor;
     private Bitmap bitmapBuffer;
-
-    private final String TAG = "CameraXActivity";
-    private final int REQUEST_CODE_PERMISSIONS = 10;
-    private String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private PreviewView viewFinder;
     private FocusImageView focus_view;
     private ImageButton camera_switch_button;
@@ -84,10 +84,8 @@ public class CameraXActivity extends AppCompatActivity {
     private ImageButton photo_view_button;
     private View box_prediction;
     private ImageButton flash_switch_button;
-
     private Context context;
     private File outputDirectory;
-    private final String FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS";
     private CameraParam mCameraParam;
 
 
@@ -102,6 +100,8 @@ public class CameraXActivity extends AppCompatActivity {
         if (intent.getParcelableExtra(CameraConstant.CAMERA_PARAM_KEY) != null) {
             mCameraParam = (CameraParam) intent.getParcelableExtra(CameraConstant.CAMERA_PARAM_KEY);
         }
+        Log.d(TAG, "1====111");
+
         initView();
         outputDirectory = getOutputDirectory();
         context = this;
@@ -251,7 +251,6 @@ public class CameraXActivity extends AppCompatActivity {
                     Preview preview = new Preview.Builder().build();
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
 
-
                     //设置相机支持拍照
                     imageCapture = new ImageCapture
                             .Builder()
@@ -332,12 +331,17 @@ public class CameraXActivity extends AppCompatActivity {
 
                         initCameraListener();
                     } catch (Exception e) {
+                        Log.d(TAG, "1====" + e.getMessage());
                         e.printStackTrace();
                     }
 
                 } catch (ExecutionException e) {
+                    Log.d(TAG, "2====" + e.getMessage());
+
                     e.printStackTrace();
                 } catch (InterruptedException e) {
+                    Log.d(TAG, "3====" + e.getMessage());
+
                     e.printStackTrace();
                 }
 
