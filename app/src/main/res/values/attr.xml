@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RoundRectCoverView">
+        <attr name="roundCorner" format="dimension" />
+        <attr name="roundPadding" format="dimension" />
+        <attr name="roundCoverColor" format="color" />
+    </declare-styleable>
+</resources>

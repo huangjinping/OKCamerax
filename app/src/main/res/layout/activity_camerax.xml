@@ -17,6 +17,25 @@
         app:focus_focusing_id="@drawable/focus_focusing"
         app:focus_success_id="@drawable/focus_focused" />
 
+    <com.camera.view.CardIndicator
+        android:id="@+id/view_mask"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></com.camera.view.CardIndicator>
+
+
+    <com.camera.view.CardNewIndicator
+        android:id="@+id/view_mask_new"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></com.camera.view.CardNewIndicator>
+
+    <com.camera.view.RoundRectCoverView
+        android:id="@+id/view_mask_new2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:roundCorner="10dp"
+        app:roundCoverColor="@color/mask"
+        app:roundPadding="50dp"></com.camera.view.RoundRectCoverView>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,5 +90,6 @@
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         app:srcCompat="@drawable/stop_flash" />
+
 
 </FrameLayout>

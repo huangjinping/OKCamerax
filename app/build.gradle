@@ -6,7 +6,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.eastbay.camarsx2022"
+        applicationId "com.eastbay.camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022"
         minSdk 21
         targetSdk 31
         versionCode 1

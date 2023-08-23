@@ -12,6 +12,8 @@
     <color name="icPressed">#AAFFFFFF</color>
     <color name="colorPrimaryDark">#F7D033</color>
     <color name="pc9">#808080</color>
+    <color name="mask">#aa000000</color>
+
 
 
 </resources>

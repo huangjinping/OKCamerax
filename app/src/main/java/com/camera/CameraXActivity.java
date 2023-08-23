@@ -48,6 +48,8 @@ import com.camera.utils.CameraConstant;
 import com.camera.utils.CameraParam;
 import com.camera.utils.CameraXPreviewViewTouchListener;
 import com.camera.utils.FocusImageView;
+import com.camera.view.CardIndicator;
+import com.camera.view.CardNewIndicator;
 import com.eastbay.camarsx2022.R;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -76,7 +78,7 @@ public class CameraXActivity extends AppCompatActivity {
     private CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
     private ExecutorService cameraExecutor;
     private Bitmap bitmapBuffer;
-    private String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private String[] REQUIRED_PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private PreviewView viewFinder;
     private FocusImageView focus_view;
     private ImageButton camera_switch_button;
@@ -88,6 +90,8 @@ public class CameraXActivity extends AppCompatActivity {
     private File outputDirectory;
     private CameraParam mCameraParam;
 
+    private CardIndicator view_mask;
+    private CardNewIndicator view_masknew;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,12 +100,20 @@ public class CameraXActivity extends AppCompatActivity {
         Window window = this.getWindow();
         window.setFlags(flag, flag);
         setContentView(R.layout.activity_camerax);
+        view_mask = findViewById(R.id.view_mask);
+        view_masknew = findViewById(R.id.view_mask_new);
+        view_mask.setCardSideAndOrientation(false);
+        view_mask.setBackColor(this, 0xaa000000);
+        view_masknew.setBackColor(this, 0xaa000000);
+        view_masknew.setCardSideAndOrientation(false);
+        view_mask.setVisibility(View.GONE);
+        view_masknew.setVisibility(View.GONE);
+
         Intent intent = getIntent();
         if (intent.getParcelableExtra(CameraConstant.CAMERA_PARAM_KEY) != null) {
             mCameraParam = (CameraParam) intent.getParcelableExtra(CameraConstant.CAMERA_PARAM_KEY);
         }
         Log.d(TAG, "1====111");
-
         initView();
         outputDirectory = getOutputDirectory();
         context = this;
@@ -215,8 +227,7 @@ public class CameraXActivity extends AppCompatActivity {
     }
 
     public boolean allPermissionsGranted() {
-        for (String permission : REQUIRED_PERMISSIONS
-        ) {
+        for (String permission : REQUIRED_PERMISSIONS) {
 
             Log.d(TAG, ContextCompat.checkSelfPermission(getBaseContext(), permission) + "======permission===" + permission);
             if (!(ContextCompat.checkSelfPermission(getBaseContext(), permission) == PackageManager.PERMISSION_GRANTED)) {
@@ -252,10 +263,7 @@ public class CameraXActivity extends AppCompatActivity {
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
 
                     //设置相机支持拍照
-                    imageCapture = new ImageCapture
-                            .Builder()
-                            .setFlashMode(flashMode)
-                            .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build();
+                    imageCapture = new ImageCapture.Builder().setFlashMode(flashMode).setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build();
 
 
                     OrientationEventListener orientationEventListener = new OrientationEventListener(context) {
@@ -282,9 +290,7 @@ public class CameraXActivity extends AppCompatActivity {
 
 
                     //设置相机支持图像分析
-                    ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                            .build();
+                    ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
 
                     //实时获取图像进行分析
                     imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), new ImageAnalysis.Analyzer() {
@@ -307,12 +313,7 @@ public class CameraXActivity extends AppCompatActivity {
 //                        Rational aspectRatio = viewPort1.getAspectRatio();
 //                        Log.d(TAG, aspectRatio.getNumerator() + "====1==" + aspectRatio.getDenominator());
 
-                        UseCaseGroup useCaseGroup = new UseCaseGroup.Builder()
-                                .addUseCase(preview)
-                                .addUseCase(imageAnalysis)
-                                .addUseCase(imageCapture)
-                                .setViewPort(viewPort)
-                                .build();
+                        UseCaseGroup useCaseGroup = new UseCaseGroup.Builder().addUseCase(preview).addUseCase(imageAnalysis).addUseCase(imageCapture).setViewPort(viewPort).build();
 
 
                         Camera camera = cameraProvider.bindToLifecycle(CameraXActivity.this, cameraSelector, useCaseGroup);
@@ -367,8 +368,7 @@ public class CameraXActivity extends AppCompatActivity {
                 Log.d(TAG, "单击");
                 MeteringPointFactory factory = viewFinder.getMeteringPointFactory();
                 MeteringPoint point = factory.createPoint(x, y);
-                FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
-                        .setAutoCancelDuration(3, TimeUnit.SECONDS).build();
+                FocusMeteringAction action = new FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF).setAutoCancelDuration(3, TimeUnit.SECONDS).build();
                 focus_view.startFocus(new Point(x.intValue(), y.intValue()));
                 ListenableFuture<FocusMeteringResult> future = mCameraControl.startFocusAndMetering(action);
                 future.addListener(new Runnable() {
