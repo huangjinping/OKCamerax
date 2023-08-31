@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -82,6 +83,7 @@ public class RoundRectCoverView extends View {
     public void fun1(Canvas canvas) {
         //先画一个圆角矩形,也就是透明区域
 
+
         RectF rel = new RectF(mPadding, mPadding, getWidth() - mPadding, getHeight() - mPadding);
         canvas.drawOval(rel, paint);
 //        canvas.drawRoundRect(mPadding, mPadding, getWidth() - mPadding, getHeight() - mPadding, mRoundCorner, mRoundCorner, paint);
@@ -119,6 +121,12 @@ public class RoundRectCoverView extends View {
         //把离屏缓冲的内容,绘制到View上去
         canvas.restoreToCount(count);
 
+    }
+
+
+    public Rect getPosition() {
+        Rect rect = new Rect((int) mPadding, (int) mPadding, (int) (getWidth() - mPadding), (int) (getHeight() - mPadding));
+        return rect;
     }
 
 

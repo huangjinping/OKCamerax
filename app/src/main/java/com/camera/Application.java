@@ -22,4 +22,5 @@ import androidx.camera.core.CameraXConfig;
 //}
 public class Application extends android.app.Application  {
 
+
 }

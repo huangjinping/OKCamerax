@@ -6,16 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.Surface;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -50,6 +55,7 @@ import com.camera.utils.CameraXPreviewViewTouchListener;
 import com.camera.utils.FocusImageView;
 import com.camera.view.CardIndicator;
 import com.camera.view.CardNewIndicator;
+import com.camera.view.RoundRectCoverView;
 import com.eastbay.camarsx2022.R;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -89,9 +95,10 @@ public class CameraXActivity extends AppCompatActivity {
     private Context context;
     private File outputDirectory;
     private CameraParam mCameraParam;
-
     private CardIndicator view_mask;
     private CardNewIndicator view_masknew;
+    private RoundRectCoverView view_mask_new2;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,12 +109,15 @@ public class CameraXActivity extends AppCompatActivity {
         setContentView(R.layout.activity_camerax);
         view_mask = findViewById(R.id.view_mask);
         view_masknew = findViewById(R.id.view_mask_new);
+        view_mask_new2 = findViewById(R.id.view_mask_new2);
         view_mask.setCardSideAndOrientation(false);
         view_mask.setBackColor(this, 0xaa000000);
         view_masknew.setBackColor(this, 0xaa000000);
         view_masknew.setCardSideAndOrientation(false);
+
         view_mask.setVisibility(View.GONE);
         view_masknew.setVisibility(View.GONE);
+
 
         Intent intent = getIntent();
         if (intent.getParcelableExtra(CameraConstant.CAMERA_PARAM_KEY) != null) {
@@ -122,6 +132,8 @@ public class CameraXActivity extends AppCompatActivity {
         } else {
             ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
+
+
         camera_capture_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,6 +273,7 @@ public class CameraXActivity extends AppCompatActivity {
                     int rotation = getWindowManager().getDefaultDisplay().getRotation();
                     Preview preview = new Preview.Builder().build();
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
+
 
                     //设置相机支持拍照
                     imageCapture = new ImageCapture.Builder().setFlashMode(flashMode).setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build();
@@ -418,6 +431,12 @@ public class CameraXActivity extends AppCompatActivity {
         cameraExecutor.shutdown();
     }
 
+
+    public Bitmap cropImage(Rect rect, String path) {
+        Bitmap source = BitmapFactory.decodeFile(path);
+        return Bitmap.createBitmap(source, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top);
+    }
+
     private void initView() {
         viewFinder = (PreviewView) findViewById(R.id.viewFinder);
         focus_view = (FocusImageView) findViewById(R.id.focus_view);
@@ -426,6 +445,8 @@ public class CameraXActivity extends AppCompatActivity {
         photo_view_button = (ImageButton) findViewById(R.id.photo_view_button);
         box_prediction = (View) findViewById(R.id.box_prediction);
         flash_switch_button = (ImageButton) findViewById(R.id.flash_switch_button);
+
+//        getPackageName()
 
 //        camera_switch_button.setOnClickListener(this);
 //        camera_capture_button.setOnClickListener(this);

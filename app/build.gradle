@@ -6,7 +6,10 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.eastbay.camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022camarsx2022"
+//        applicationId "com.eastbay.camarsx2022"
+//        applicationId "com.eastb.com.eastb.com.eastb.com.eastb.com.eastb.comcomcom"
+
+        applicationId "com.eastb.com.eastb.com.eastb.com.eastb.com.eastb.c"
         minSdk 21
         targetSdk 31
         versionCode 1
@@ -33,7 +36,7 @@ android {
         }
 
         release {
-            minifyEnabled false
+            minifyEnabled true
             signingConfig signingConfigs.key
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
