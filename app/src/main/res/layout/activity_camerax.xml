@@ -12,7 +12,7 @@
 
 
 
-    <com.camera.utils.FocusImageView
+    <com.eastbay.camarsx2022.utils.FocusImageView
         android:id="@+id/focus_view"
         android:layout_width="75dp"
         android:layout_height="75dp"
@@ -20,24 +20,24 @@
         app:focus_focusing_id="@drawable/focus_focusing"
         app:focus_success_id="@drawable/focus_focused" />
 
-    <com.camera.view.CardIndicator
+    <com.eastbay.camarsx2022.view.CardIndicator
         android:id="@+id/view_mask"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.camera.view.CardIndicator>
+        android:layout_height="match_parent"></com.eastbay.camarsx2022.view.CardIndicator>
 
 
-    <com.camera.view.CardNewIndicator
+    <com.eastbay.camarsx2022.view.CardNewIndicator
         android:id="@+id/view_mask_new"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.camera.view.CardNewIndicator>
+        android:layout_height="match_parent"></com.eastbay.camarsx2022.view.CardNewIndicator>
 
-    <com.camera.view.RoundRectCoverView
+    <com.eastbay.camarsx2022.view.RoundRectCoverView
         android:id="@+id/view_mask_new2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:roundCorner="10dp"
         app:roundCoverColor="@color/mask"
-        app:roundPadding="50dp"></com.camera.view.RoundRectCoverView>
+        app:roundPadding="50dp"></com.eastbay.camarsx2022.view.RoundRectCoverView>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -53,7 +53,7 @@
             android:layout_marginStart="20dp"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_switch" />
+            app:srcCompat="@drawable/ic_outer_circle" />
 
         <ImageButton
             android:id="@+id/camera_capture_button"
