@@ -23,38 +23,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.FileUtils;
-import android.provider.ContactsContract;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.View;
-import android.webkit.MimeTypeMap;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.bumptech.glide.Glide;
-
-import com.eastbay.camarsx2022.R;
 import com.eastbay.camarsx2022.luban.Luban;
 import com.eastbay.camarsx2022.luban.OnCompressListener;
 import com.eastbay.camarsx2022.utils.CameraConstant;
 import com.eastbay.camarsx2022.utils.CameraParam;
+import com.eastbay.camarsx2022.utils.DeviceUtils;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -66,9 +42,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * https://developer.android.com/jetpack/androidx/releases/camera?hl=zh-cn
- *
+ * <p>
  * https://developer.android.com/codelabs/camerax-getting-started?hl=zh-cn#8
- *
  */
 
 
@@ -79,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     ImageView notoriouspramcompeteclarify;
     TextView txtaubm;
     private CountDownTimer countDownTimer;
+
+    private TextView txtAppInfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        txtAppInfo = findViewById(R.id.txtAppInfo);
 
         txtaubm = findViewById(R.id.txtaubm);
         txtaubm.setOnClickListener(new View.OnClickListener() {
@@ -111,8 +90,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        setHardWord();
+
 //        onTimeDisposable();
     }
+
+    private void setHardWord() {
+        try {
+            JSONObject hardWareInfo = DeviceUtils.getHardWareInfo(this);
+            txtAppInfo.setText(hardWareInfo.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     private void onTimeDisposable() {
         try {
@@ -305,8 +298,7 @@ public class MainActivity extends AppCompatActivity {
         } else if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
             //把文件复制到沙盒目录
             ContentResolver contentResolver = context.getContentResolver();
-            String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000)
-                    + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
+            String displayName = System.currentTimeMillis() + Math.round((Math.random() + 1) * 1000) + "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri));
 
             try {
                 InputStream is = contentResolver.openInputStream(uri);
@@ -329,30 +321,26 @@ public class MainActivity extends AppCompatActivity {
     public void onChcnage(String path) {
         Log.d("onActivityResult", "0000000000000000001" + path);
 
-        new Compressor(this)
-                .compressToFileAsFlowable(new File(path))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) {
-                        try {
-                            Log.d("onActivityResult", "0000000000000000005");
-                            Log.d("onActivityResult", "0000000000000000005" + file.getAbsolutePath());
+        new Compressor(this).compressToFileAsFlowable(new File(path)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<File>() {
+            @Override
+            public void accept(File file) {
+                try {
+                    Log.d("onActivityResult", "0000000000000000005");
+                    Log.d("onActivityResult", "0000000000000000005" + file.getAbsolutePath());
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Log.d("onActivityResult", "0000000000000000006");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) {
+                Log.d("onActivityResult", "0000000000000000006");
 
-                        throwable.printStackTrace();
+                throwable.printStackTrace();
 //                        DisplayToast("压缩失败了");
-                    }
-                });
+            }
+        });
     }
 
     private void onTEST() {
@@ -365,33 +353,29 @@ public class MainActivity extends AppCompatActivity {
 
     public void onLuban(String path) {
         Log.d("onActivityResult1", "===onLuban===0");
-        Luban.with(this)
-                .load(path)
-                .ignoreBy(100)
-                .setTargetDir(this.getExternalCacheDir().getAbsolutePath())
-                .setCompressListener(new OnCompressListener() {
-                    @Override
-                    public void onStart() {
-                        Log.d("onActivityResult1", "===onStart==1=");
+        Luban.with(this).load(path).ignoreBy(100).setTargetDir(this.getExternalCacheDir().getAbsolutePath()).setCompressListener(new OnCompressListener() {
+            @Override
+            public void onStart() {
+                Log.d("onActivityResult1", "===onStart==1=");
 
-                    }
+            }
 
-                    @Override
-                    public void onSuccess(File file) {
-                        Log.d("onActivityResult1", "===onLuban==1=" + file.getAbsolutePath());
+            @Override
+            public void onSuccess(File file) {
+                Log.d("onActivityResult1", "===onLuban==1=" + file.getAbsolutePath());
 
 
-                        Glide.with(MainActivity.this).load(file).into(notoriouspramcompeteclarify);
+                Glide.with(MainActivity.this).load(file).into(notoriouspramcompeteclarify);
 
 
-                    }
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d("onActivityResult1", "===onError==1=");
+            @Override
+            public void onError(Throwable e) {
+                Log.d("onActivityResult1", "===onError==1=");
 
-                    }
-                }).launch();
+            }
+        }).launch();
 
     }
 
@@ -416,9 +400,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onCliew() {
-        CameraParam mCameraParam = new CameraParam.Builder()
-                .setRequestCode(1016)
-                .setActivity(MainActivity.this)
-                .build();
+        CameraParam mCameraParam = new CameraParam.Builder().setRequestCode(1016).setActivity(MainActivity.this).build();
     }
 }
