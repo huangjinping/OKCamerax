@@ -4,18 +4,25 @@ package com.eastbay.camarsx2022.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
 
+import androidx.camera.core.ImageProxy;
 import androidx.core.content.FileProvider;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -79,6 +86,53 @@ public class FileUtil {
 //        }
         return getAbsolutePath(context.getExternalCacheDir());
     }
+
+    public static Bitmap toBitmap(ImageProxy imageProxy) {
+        try {
+            ByteBuffer yBuffer = imageProxy.getPlanes()[0].getBuffer();
+            ByteBuffer uBuffer = imageProxy.getPlanes()[1].getBuffer();
+            ByteBuffer vBuffer = imageProxy.getPlanes()[2].getBuffer();
+
+            int ySize = yBuffer.remaining();
+            int uSize = uBuffer.remaining();
+            int vSize = vBuffer.remaining();
+
+            byte[] nv21 = new byte[ySize + uSize + vSize];
+
+            yBuffer.get(nv21, 0, ySize);
+            vBuffer.get(nv21, ySize, vSize);
+            uBuffer.get(nv21, ySize + vSize, uSize);
+
+            YuvImage yuvImage = new YuvImage(nv21, ImageFormat.NV21, imageProxy.getWidth(), imageProxy.getHeight(), null);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 100, out);
+            byte[] imageBytes = out.toByteArray();
+
+            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // 根据需求返回 null 或抛出异常
+        }
+    }
+
+
+    public static void saveBitmapFile(Bitmap bitmap, File filePath) {
+
+
+        Log.d("saveBitmapFile", filePath + "");
+        try {
+            File file = new File(filePath.getAbsolutePath());//将要保存图片的路径
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            bos.flush();
+            bos.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     private static String getAbsolutePath(final File file) {
         if (file == null) {

@@ -66,6 +66,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * https://developer.android.com/jetpack/androidx/releases/camera?hl=zh-cn
+ *
+ * https://developer.android.com/codelabs/camerax-getting-started?hl=zh-cn#8
+ *
  */
 
 

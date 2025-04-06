@@ -10,8 +10,6 @@
         android:layout_height="match_parent" />
 
 
-
-
     <com.eastbay.camarsx2022.utils.FocusImageView
         android:id="@+id/focus_view"
         android:layout_width="75dp"
@@ -93,6 +91,12 @@
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
         app:srcCompat="@drawable/stop_flash" />
+
+
+    <ImageView
+        android:id="@+id/img_result"
+        android:layout_width="100dp"
+        android:layout_height="100dp"></ImageView>
 
 
 </FrameLayout>

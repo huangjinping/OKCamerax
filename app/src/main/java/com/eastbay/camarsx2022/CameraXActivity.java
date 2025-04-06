@@ -2,6 +2,7 @@ package com.eastbay.camarsx2022;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,10 +48,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 
-
 import com.eastbay.camarsx2022.utils.CameraConstant;
 import com.eastbay.camarsx2022.utils.CameraParam;
 import com.eastbay.camarsx2022.utils.CameraXPreviewViewTouchListener;
+import com.eastbay.camarsx2022.utils.FileUtil;
 import com.eastbay.camarsx2022.utils.FocusImageView;
 import com.eastbay.camarsx2022.view.CardIndicator;
 import com.eastbay.camarsx2022.view.CardNewIndicator;
@@ -75,7 +77,7 @@ public class CameraXActivity extends AppCompatActivity {
     private ImageCapture imageCapture;
     private CameraControl mCameraControl;
     private CameraInfo mCameraInfo;
-    private boolean isInfer = true;
+    private boolean shouldAnalyze = false;
     private int imageRotationDegrees = 0;
     private int flashMode = ImageCapture.FLASH_MODE_OFF;
     private CameraSelector cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA;
@@ -87,6 +89,8 @@ public class CameraXActivity extends AppCompatActivity {
     private ImageButton camera_switch_button;
     private ImageButton camera_capture_button;
     private ImageButton photo_view_button;
+    private ImageView img_result;
+
     private View box_prediction;
     private ImageButton flash_switch_button;
     private Context context;
@@ -95,7 +99,7 @@ public class CameraXActivity extends AppCompatActivity {
     private CardIndicator view_mask;
     private CardNewIndicator view_masknew;
     private RoundRectCoverView view_mask_new2;
-
+    private ProgressDialog mProgressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,6 +109,7 @@ public class CameraXActivity extends AppCompatActivity {
         window.setFlags(flag, flag);
         setContentView(R.layout.activity_camerax);
         view_mask = findViewById(R.id.view_mask);
+        img_result = findViewById(R.id.img_result);
         view_masknew = findViewById(R.id.view_mask_new);
         view_mask_new2 = findViewById(R.id.view_mask_new2);
         view_mask.setCardSideAndOrientation(false);
@@ -134,7 +139,8 @@ public class CameraXActivity extends AppCompatActivity {
         camera_capture_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                takePhoto();
+//                takePhoto();
+                tackPhoto2();
             }
         });
         cameraExecutor = Executors.newSingleThreadExecutor();
@@ -173,7 +179,6 @@ public class CameraXActivity extends AppCompatActivity {
         });
     }
 
-
     public File getOutputDirectory() {
         File file = new File(getExternalCacheDir(), getString(R.string.app_name));
         if (!file.exists()) {
@@ -182,11 +187,18 @@ public class CameraXActivity extends AppCompatActivity {
         return file;
     }
 
+    private void tackPhoto2() {
+        shouldAnalyze = true;
+        Toast.makeText(context, "截取一帧的方式!", Toast.LENGTH_SHORT).show();
+    }
+
     private void takePhoto() {
         ImageCapture tImageCapture = imageCapture;
         if (tImageCapture == null) {
             return;
         }
+        Toast.makeText(context, "拍照方式", Toast.LENGTH_SHORT).show();
+        showProgress();
         File photoFile = new File(outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
         Log.d(TAG, "==photoFile===" + photoFile.getAbsolutePath());
         ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
@@ -206,6 +218,7 @@ public class CameraXActivity extends AppCompatActivity {
 
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                dismissProgress();
                 Uri savedUri = Uri.fromFile(photoFile);
 //                String msg = "Photo capture succeeded: $savedUri";
 //                Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
@@ -228,12 +241,31 @@ public class CameraXActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull ImageCaptureException exception) {
+                dismissProgress();
+                Toast.makeText(context, "Photo capture failed: " + exception.getMessage() + "", Toast.LENGTH_SHORT).show();
                 Log.e(TAG, "Photo capture failed: " + exception.getMessage() + "");
 
             }
         });
 
     }
+
+    public void showProgress() {
+        if (mProgressBar != null) {
+            return;
+        }
+        mProgressBar = new ProgressDialog(this);
+        mProgressBar.show();
+    }
+
+    public void dismissProgress() {
+        if (mProgressBar != null) {
+            mProgressBar.dismiss();
+            mProgressBar = null;
+        }
+
+    }
+
 
     public boolean allPermissionsGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
@@ -272,10 +304,8 @@ public class CameraXActivity extends AppCompatActivity {
                     Preview preview = new Preview.Builder().build();
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
 
-
                     //设置相机支持拍照
                     imageCapture = new ImageCapture.Builder().setFlashMode(flashMode).setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY).build();
-
 
                     OrientationEventListener orientationEventListener = new OrientationEventListener(context) {
                         @Override
@@ -292,13 +322,11 @@ public class CameraXActivity extends AppCompatActivity {
                             } else {
                                 rotation = Surface.ROTATION_0;
                             }
-
                             imageCapture.setTargetRotation(rotation);
                         }
                     };
 
                     orientationEventListener.enable();
-
 
                     //设置相机支持图像分析
                     ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3).setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
@@ -307,8 +335,16 @@ public class CameraXActivity extends AppCompatActivity {
                     imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context), new ImageAnalysis.Analyzer() {
                         @Override
                         public void analyze(@NonNull ImageProxy image) {
-                            if (isInfer) {
-
+                            if (shouldAnalyze) {
+//                                Bitmap bitmap = FileUtil.toBitmap(image, context);
+//                                Bitmap bitmap = CameraUtils.toBitmap(image, context, CameraSelector.DEFAULT_FRONT_CAMERA == cameraSelector);
+////                                Bitmap bitmap = image.toBitmap();
+//                                Glide.with(CameraXActivity.this).load(bitmap).into(img_result);
+//                                Log.d("CameraXanalyze", "获取到图像: ${" + bitmap.getWidth() + "}x${" + bitmap.getHeight() + "}");
+                                saveImage(image);
+                                shouldAnalyze = false;
+                            } else {
+                                image.close();
                             }
                         }
                     });
@@ -372,6 +408,7 @@ public class CameraXActivity extends AppCompatActivity {
                 ZoomState value = zoomState.getValue();
                 float currentZoomRatio = value.getZoomRatio();
                 mCameraControl.setZoomRatio(currentZoomRatio * delta);
+
             }
 
             @Override
@@ -452,5 +489,38 @@ public class CameraXActivity extends AppCompatActivity {
 //        flash_switch_button.setOnClickListener(this);
     }
 
+
+    private void saveImage(ImageProxy image) {
+        try {
+            File photoFile = new File(outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    Bitmap bitmap = CameraUtils.toBitmap(image, context, CameraSelector.DEFAULT_FRONT_CAMERA == cameraSelector);
+                    Log.d("CameraXanalyze", "获取到图像: ${" + bitmap.getWidth() + "}x${" + bitmap.getHeight() + "}");
+                    FileUtil.saveBitmapFile(bitmap, photoFile);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            bitmap.recycle();
+                            Toast.makeText(context, "截图保存成功", Toast.LENGTH_SHORT).show();
+                            shouldAnalyze = false;
+                            image.close();
+                            Intent intent = new Intent();
+                            intent.putExtra(CameraConstant.PICTURE_PATH_KEY, photoFile.getAbsolutePath());
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
+                    });
+
+                }
+            }.start();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
