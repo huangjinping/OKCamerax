@@ -1,5 +1,6 @@
 package com.eastbay.camarsx2022;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -44,6 +45,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * https://developer.android.com/jetpack/androidx/releases/camera?hl=zh-cn
  * <p>
  * https://developer.android.com/codelabs/camerax-getting-started?hl=zh-cn#8
+ *
+ * https://developer.android.com/media/camera/choose-camera-library?hl=zh-cn
  */
 
 
@@ -318,10 +321,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+    @SuppressLint("CheckResult")
     public void onChcnage(String path) {
         Log.d("onActivityResult", "0000000000000000001" + path);
 
         new Compressor(this).compressToFileAsFlowable(new File(path)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<File>() {
+
             @Override
             public void accept(File file) {
                 try {

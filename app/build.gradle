@@ -40,23 +40,22 @@ dependencies {
 //    implementation 'com.android.support:support-compat:27.1.1'
 
 
-//    def camerax_version = "1.2.1"
-    def camerax_version = "1.4.2"
-
+    def camerax_version = "1.2.1"
+//    def camerax_version = "1.4.2"
 
 // CameraX core library using camera2 implementation
     implementation "androidx.camera:camera-core:$camerax_version"
 
     implementation "androidx.camera:camera-camera2:$camerax_version"
+
+
 // CameraX Lifecycle Library
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
 // CameraX View class
 //    implementation 'androidx.camera:camera-view:1.0.0-alpha24'
     implementation "androidx.camera:camera-view:${camerax_version}"
-
     implementation 'io.reactivex.rxjava3:rxjava:3.1.4'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
-
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
 }

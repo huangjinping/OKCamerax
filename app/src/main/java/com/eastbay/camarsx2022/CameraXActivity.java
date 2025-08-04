@@ -139,8 +139,8 @@ public class CameraXActivity extends AppCompatActivity {
         camera_capture_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                takePhoto();
-                tackPhoto2();
+                takePhoto();
+//                tackPhoto2();
             }
         });
         cameraExecutor = Executors.newSingleThreadExecutor();
@@ -489,9 +489,9 @@ public class CameraXActivity extends AppCompatActivity {
 //        flash_switch_button.setOnClickListener(this);
     }
 
-
     private void saveImage(ImageProxy image) {
         try {
+
             File photoFile = new File(outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
             new Thread() {
                 @Override
